@@ -338,3 +338,110 @@ void Grammar::PrintI() const
 		std::cout << "I_" << i.first << "=" << GetUUID(i.second) << std::endl;
 	}
 }
+
+void Grammar::GenerateFirstAndFollow()
+{
+	for (auto p : productions)
+	{
+		std::string firstSymbol = p.second.GetSymbol(0);
+		if (IsTerminal(firstSymbol))
+		{
+			first[p.second.head].insert(firstSymbol);
+		}
+	}
+
+	bool added = false;
+	do
+	{
+		added = false;
+		for (auto p : productions)
+		{
+			std::string firstSymbol = p.second.GetSymbol(0);
+			if (IsNonTerminal(firstSymbol))
+			{
+				int sizeBefore = first[p.second.head].size();
+				first[p.second.head].insert(first[firstSymbol].begin(),first[firstSymbol].end());
+				if (sizeBefore != first[p.second.head].size())
+				{
+					added = true;
+				}
+			}
+		}
+	} while (added);
+
+	follow["$$$$$$$$$$$$$$$$"].insert("################");
+	for (auto p : productions)
+	{
+		int length = p.second.GetLength();
+		for (int i = 0; i < length - 1; i++)
+		{
+			std::string symbol = p.second.GetSymbol(i);
+			std::string nxtSymbol = p.second.GetSymbol(i + 1);
+			if (IsNonTerminal(symbol) && IsTerminal(nxtSymbol))
+			{
+				follow[symbol].insert(nxtSymbol);
+			}
+		}
+	}
+
+	do
+	{
+		added = false;
+		for (auto p : productions)
+		{
+			int sizeBefore;
+			int length = p.second.GetLength();
+			for (int i = 0; i < length - 1; i++)
+			{
+				std::string symbol = p.second.GetSymbol(i);
+				std::string nxtSymbol = p.second.GetSymbol(i + 1);
+				if (IsNonTerminal(symbol) && IsNonTerminal(nxtSymbol))
+				{
+					sizeBefore = follow[symbol].size();
+					follow[symbol].insert(first[nxtSymbol].begin(), first[nxtSymbol].end());
+					if (sizeBefore != follow[symbol].size())
+					{
+						added = true;
+					}
+				}
+			}
+
+			std::string lastSymbol = p.second.GetSymbol(p.second.GetLength() - 1);
+			if (IsNonTerminal(lastSymbol))
+			{
+				sizeBefore = follow[lastSymbol].size();
+				follow[lastSymbol].insert(follow[p.second.head].begin(), follow[p.second.head].end());
+				if (sizeBefore != follow[lastSymbol].size())
+				{
+					added = true;
+				}
+			}
+		}
+	} while (added);
+}
+
+void Grammar::PrintFirst() const
+{
+	for (auto it : first)
+	{
+		std::cout << "first[" << it.first << "]=" << "{";
+		for (auto s : it.second)
+		{
+			std::cout << s << " ";
+		}
+		std::cout << "}" << std::endl;
+	}
+}
+
+void Grammar::PrintFollow() const
+{
+	for (auto it : follow)
+	{
+		std::cout << "follow[" << it.first << "]=" << "{";
+		for (auto s : it.second)
+		{
+			std::cout << s << " ";
+		}
+		std::cout << "}" << std::endl;
+	}
+}

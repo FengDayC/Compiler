@@ -9,6 +9,7 @@
 #include<set>
 #include<initializer_list>
 #include<functional>
+#include<list>
 
 /*###############################Utils########################################*/
 

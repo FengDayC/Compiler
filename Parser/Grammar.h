@@ -29,6 +29,8 @@ public:
 
 class Production
 {
+
+    friend class Grammar;
 private:
     std::string head;
     std::vector<std::string> body;
@@ -62,6 +64,8 @@ public:
 
     void GenerateGOandI(ItemSet closure);
 
+    void GenerateFirstAndFollow();
+
 public:
 
     void PrintAllProduction() const;
@@ -71,6 +75,10 @@ public:
     void PrintGO() const;
 
     void PrintI() const;
+
+    void PrintFirst() const;
+
+    void PrintFollow() const;
 
 private:
     bool IsTerminal(std::string symbol) const;
@@ -96,6 +104,10 @@ private:
     std::set<std::string> terminal;
     
     std::set<std::string> nonterminal;
+
+    std::map<std::string, std::set<std::string>> follow;
+
+    std::map<std::string, std::set<std::string>> first;
     
     std::map<std::string, std::vector<std::string>> productionsTable;
 

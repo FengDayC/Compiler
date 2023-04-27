@@ -29,6 +29,11 @@ void TestClosure()
     grammar->PrintGO();
     std::cout << "I:" << std::endl;
     grammar->PrintI();
+    grammar->GenerateFirstAndFollow();
+    std::cout << "First:" << std::endl;
+    grammar->PrintFirst();
+    std::cout << "Follow:" << std::endl;
+    grammar->PrintFollow();
 }
 
 int main(int, char**) 
