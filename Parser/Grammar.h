@@ -3,49 +3,28 @@
 class Item
 {
 public:
+    Item(int dotPlace, std::string production,bool fullyExtended);
+public:
     int dotPlace;
-    std::string head;
-    std::vector<std::string> body;
+    std::string production;
+    bool fullyExtended;
 
 public:
+    bool operator==(const Item& b) const;
 
     bool operator<(const Item& b) const;
-
-public:
-    std::string GetItem() const
-    {
-        return body[dotPlace];
-    }
-
-    bool Fully_Extended() const
-    {
-        return body.size() <= dotPlace;
-    }
-
-    Item GetNxt() const
-    {
-        return Item{ dotPlace + 1,head,body };
-    }
-
-    std::string GetUUID() const
-    {
-        S_PTR(std::stringstream, sstream) = MK_SPTR(std::stringstream, );
-        *sstream << head << "->";
-        for (int i = 0; i < body.size(); i++)
-        {
-            if (dotPlace == i)
-            {
-                *sstream << ".";
-            }
-            *sstream << body[i];
-        }
-
-        return sstream->str();
-    }
 };
 
 class ItemSet
 {
+    friend class Grammar;
+
+private:
+    std::set<Item> generator;
+    std::set<Item> items;
+
+public:
+    bool operator==(const ItemSet& b) const;
 };
 
 class Production
@@ -53,70 +32,54 @@ class Production
 private:
     std::string head;
     std::vector<std::string> body;
+    int length;
 
 public:
     Production(std::string head, std::vector<std::string> body);
 
     Production(std::vector<std::string> items);
 
-    std::string ToString() const 
-    { 
-        S_PTR(std::stringstream, sstream) = MK_SPTR(std::stringstream, );
-        *sstream << head << "->";
-        for (auto item : body)
-        {
-            *sstream << item;
-        }
-        return sstream->str();
-    }
+    std::string ToString() const;
     
-    Item GetFirstCanonnialCollection() const
-    {
-        return Item{ 0,head,body };
-    }
+    Item GetFirstCanonnialCollection() const;
+
+    std::string GetSymbol(int index) const;
+
+    std::string GetHead() const;
+
+    int GetLength() const;
 };
 
 class Grammar
 {
 public:
 
-    Grammar(std::string start, std::set<std::string> terminal, std::set<std::string> nonterminal, std::map<std::string, std::vector<Production>> productions);
+    Grammar(std::string start, std::set<std::string> terminal, std::set<std::string> nonterminal, std::map<std::string, std::vector<std::vector<std::string>>> productionsTable);
 
 public:
 
-    std::shared_ptr<std::map<std::string,Item>> GetClosure();
+    ItemSet GetClosure();
 
-    void PrintAllProduction() const
-    {
-        for (auto p : productions)
-        {
-            for (auto pp : p.second)
-            {
-                std::cout << pp.ToString() << std::endl;
-            }
-        }
-    }
+    void PrintAllProduction() const;
 
-    void PrintAllCanonnialCollections() const
-    {
-        for (auto p : *canonnialCollections)
-        {
-            std::cout << p.second.GetUUID() << std::endl;
-        }
-    }
+    void PrintItemSet(ItemSet itemSet) const;
 
 private:
-    bool IsTerminal(std::string symbol) const
-    {
-        return terminal.find(symbol) != terminal.end();
-    }
+    bool IsTerminal(std::string symbol) const;
 
-    bool IsNonTerminal(std::string symbol) const
-    {
-        return nonterminal.find(symbol) != nonterminal.end();
-    }
+    bool IsNonTerminal(std::string symbol) const;
 
-public:
+    Production GetProduction(std::string key) const;
+
+    std::string GetDotSymbol(Item item) const;
+
+    Item GetNxt(Item item) const;
+
+    std::string GetUUID(Item item) const;
+
+    void Extend(ItemSet &itemSet) const;
+
+private:
     
     std::string start;
     
@@ -124,9 +87,7 @@ public:
     
     std::set<std::string> nonterminal;
     
-    std::map<std::string, std::vector<Production>> productions;
+    std::map<std::string, std::vector<std::string>> productionsTable;
 
-private:
-
-    std::shared_ptr<std::map<std::string, Item>> canonnialCollections;
+    std::map<std::string, Production> productions;
 };

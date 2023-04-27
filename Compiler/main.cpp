@@ -6,23 +6,24 @@ void TestClosure()
     std::set<std::string> terminal{ "a","b","c","d" };
     std::set<std::string> nonterminal{ "S","A","B" };
     std::vector<std::vector<std::string>> items =
-        { { "S", "A", "B" },
-        { "B", "c", "B", "d"},
-        { "B", "c", "d" },
-        { "A", "a", "A", "b"},
-        { "A", "a", "b" } 
+        { { "A", "B" },
+        { "c", "B", "d"},
+        { "c", "d" },
+        { "a", "A", "b"},
+        { "a", "b" } 
     };
-    std::map<std::string, std::vector<Production>> productions;
-    std::vector<Production> p0 = std::vector<Production>{ Production(items[0]) };
-    std::vector<Production> p1 = std::vector<Production>{ Production(items[1]),Production(items[2]) };
-    std::vector<Production> p2 = std::vector<Production>{ Production(items[3]),Production(items[4]) };
-    productions.insert(MK_PAIR("S", p0));
-    productions.insert(MK_PAIR("B", p1));
-    productions.insert(MK_PAIR("A", p2));
+    std::vector<std::vector<std::string>> temp;
+    std::map<std::string, std::vector<std::vector<std::string>>> productions;
+    temp.assign(items.begin(), items.begin() + 1);
+    productions.insert(MK_PAIR("S", temp));
+    temp.assign(items.begin() + 1, items.begin() + 3);
+    productions.insert(MK_PAIR("B", temp));
+    temp.assign(items.begin() + 3, items.end());
+    productions.insert(MK_PAIR("A", temp));
+
     S_PTR(Grammar, grammar) = MK_SPTR(Grammar, "S", terminal, nonterminal, productions);
-    grammar->PrintAllProduction();
-    grammar->GetClosure();
-    grammar->PrintAllCanonnialCollections();
+    ItemSet closure = grammar->GetClosure();
+    grammar->PrintItemSet(closure);
 }
 
 int main(int, char**) 
