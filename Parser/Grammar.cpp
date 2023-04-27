@@ -1,6 +1,11 @@
 #include "pch.h"
 #include "Grammar.h"
 
+bool Item::operator<(const Item& b) const
+{
+	return GetUUID() < b.GetUUID();
+}
+
 Production::Production(std::string head, std::vector<std::string> body)
 	:head(head),body(body)
 {
@@ -20,11 +25,11 @@ Grammar::Grammar(std::string start, std::set<std::string> terminal, std::set<std
 
 }
 
-std::shared_ptr<std::map<std::string, CanonnialCollection>> Grammar::GetClosure()
+std::shared_ptr<std::map<std::string, Item>> Grammar::GetClosure()
 {
-	std::shared_ptr<std::map<std::string, CanonnialCollection>> closure = std::make_shared<std::map<std::string, CanonnialCollection>>();
-	CanonnialCollection start{ 0,std::string("$$$$$$$$"), std::vector<std::string>{this->start} };
-	std::shared_ptr<std::map<std::string, CanonnialCollection>> delta = std::make_shared<std::map<std::string, CanonnialCollection>>();
+	std::shared_ptr<std::map<std::string, Item>> closure = std::make_shared<std::map<std::string, Item>>();
+	Item start{ 0,std::string("$$$$$$$$"), std::vector<std::string>{this->start} };
+	std::shared_ptr<std::map<std::string, Item>> delta = std::make_shared<std::map<std::string, Item>>();
 	closure->insert(MK_PAIR(start.GetUUID(), start));
 	do
 	{
@@ -33,7 +38,7 @@ std::shared_ptr<std::map<std::string, CanonnialCollection>> Grammar::GetClosure(
 
 		for (auto collection_pair : *closure)
 		{
-			CanonnialCollection collection = collection_pair.second;
+			Item collection = collection_pair.second;
 			std::string symbol = collection.GetItem();
 			if (collection.Fully_Extended())
 			{
@@ -44,7 +49,7 @@ std::shared_ptr<std::map<std::string, CanonnialCollection>> Grammar::GetClosure(
 				std::vector<Production> productions = this->productions[symbol];
 				for (auto production : productions)
 				{
-					CanonnialCollection newCollection = production.GetFirstCanonnialCollection();
+					Item newCollection = production.GetFirstCanonnialCollection();
 					if (closure->find(newCollection.GetUUID()) == closure->end() && delta->find(newCollection.GetUUID()) == delta->end())
 					{
 						delta->insert(MK_PAIR(newCollection.GetUUID(), newCollection));

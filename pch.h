@@ -8,6 +8,7 @@
 #include<vector>
 #include<set>
 #include<initializer_list>
+#include<functional>
 
 /*###############################Utils########################################*/
 

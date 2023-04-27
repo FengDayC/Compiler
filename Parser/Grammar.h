@@ -1,11 +1,15 @@
 #pragma once
 
-class CanonnialCollection
+class Item
 {
 public:
     int dotPlace;
     std::string head;
     std::vector<std::string> body;
+
+public:
+
+    bool operator<(const Item& b) const;
 
 public:
     std::string GetItem() const
@@ -18,9 +22,9 @@ public:
         return body.size() <= dotPlace;
     }
 
-    CanonnialCollection GetNxt() const
+    Item GetNxt() const
     {
-        return CanonnialCollection{ dotPlace + 1,head,body };
+        return Item{ dotPlace + 1,head,body };
     }
 
     std::string GetUUID() const
@@ -38,6 +42,10 @@ public:
 
         return sstream->str();
     }
+};
+
+class ItemSet
+{
 };
 
 class Production
@@ -62,9 +70,9 @@ public:
         return sstream->str();
     }
     
-    CanonnialCollection GetFirstCanonnialCollection() const
+    Item GetFirstCanonnialCollection() const
     {
-        return CanonnialCollection{ 0,head,body };
+        return Item{ 0,head,body };
     }
 };
 
@@ -76,7 +84,7 @@ public:
 
 public:
 
-    std::shared_ptr<std::map<std::string,CanonnialCollection>> GetClosure();
+    std::shared_ptr<std::map<std::string,Item>> GetClosure();
 
     void PrintAllProduction() const
     {
@@ -120,5 +128,5 @@ public:
 
 private:
 
-    std::shared_ptr<std::map<std::string, CanonnialCollection>> canonnialCollections;
+    std::shared_ptr<std::map<std::string, Item>> canonnialCollections;
 };
