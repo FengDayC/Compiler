@@ -24,6 +24,11 @@ void TestClosure()
     S_PTR(Grammar, grammar) = MK_SPTR(Grammar, "S", terminal, nonterminal, productions);
     ItemSet closure = grammar->GetClosure();
     grammar->PrintItemSet(closure);
+    grammar->GenerateGOandI(closure);
+    std::cout << "GO:" << std::endl;
+    grammar->PrintGO();
+    std::cout << "I:" << std::endl;
+    grammar->PrintI();
 }
 
 int main(int, char**) 

@@ -139,7 +139,7 @@ std::string Grammar::GetDotSymbol(Item item) const
 
 Item Grammar::GetNxt(Item item) const
 {
-	return Item{ item.dotPlace + 1,item.production,item.dotPlace >= GetProduction(item.production).GetLength() };
+	return Item{ item.dotPlace + 1,item.production,item.dotPlace+1 >= GetProduction(item.production).GetLength() };
 }
 
 std::string Grammar::GetUUID(Item item) const
@@ -154,6 +154,11 @@ std::string Grammar::GetUUID(Item item) const
 			*sstream << ".";
 		}
 		*sstream << production.GetSymbol(i);
+	}
+
+	if (item.dotPlace == production.GetLength())
+	{
+		*sstream << ".";
 	}
 
 	return sstream->str();
@@ -173,6 +178,10 @@ void Grammar::Extend(ItemSet &itemSet) const
 {
 	for (auto item : itemSet.generator)
 	{
+		if (item.fullyExtended)
+		{
+			continue;
+		}
 		std::string dotSymbol = GetDotSymbol(item);
 		if (!item.fullyExtended && IsNonTerminal(dotSymbol))
 		{
@@ -219,5 +228,113 @@ void Grammar::PrintItemSet(ItemSet itemSet) const
 	for (auto i : itemSet.items)
 	{
 		std::cout << GetUUID(i) << std::endl;
+	}
+}
+
+std::string Grammar::GetUUID(ItemSet itemSet) const
+{
+	S_PTR(std::stringstream, sstream) = MK_SPTR(std::stringstream, );
+	for (auto g : itemSet.generator)
+	{
+		*sstream << GetUUID(g) << " ";
+	}
+	//*sstream << "$";
+	for (auto i : itemSet.items)
+	{
+		*sstream << GetUUID(i) << " ";
+	}
+	return sstream->str();
+}
+
+void Grammar::GenerateGOandI(ItemSet closure)
+{
+	//I_0=Closure({"$$$$$$$$$$$$$$$$"->start})
+	I[0] = closure;
+
+	std::map<std::string,int> in;
+	in[GetUUID(closure)] = 0;
+	int cnt = 1, index = 0;
+
+	while (index < cnt)
+	{
+		std::cout << "index=" << index << " cnt=" << cnt << std::endl;
+		ItemSet now = I[index];
+		std::map<std::string, std::list<Item>> temp_table;
+		for (auto& g : now.generator)
+		{
+			if (!g.fullyExtended)
+			{
+				std::string symbol = GetDotSymbol(g);
+				auto it = temp_table.find(symbol);
+				if (it == temp_table.end())
+				{
+					std::list<Item> list;
+					list.push_back(g);
+					temp_table.insert(MK_PAIR(symbol, list));
+				}
+				else
+				{
+					it->second.push_back(g);
+				}
+			}
+		}
+		for (auto& i : now.items)
+		{
+			if (!i.fullyExtended)
+			{
+				std::string symbol = GetDotSymbol(i);
+				auto it = temp_table.find(symbol);
+				if (it == temp_table.end())
+				{
+					std::list<Item> list;
+					list.push_back(i);
+					temp_table.insert(MK_PAIR(symbol, list));
+				}
+				else
+				{
+					it->second.push_back(i);
+				}
+			}
+		}
+		if (temp_table.size())
+		{
+			for (auto& [key, list] : temp_table)
+			{
+				ItemSet itemSet;
+				for (auto item : list)
+				{
+					itemSet.generator.insert(GetNxt(item));
+				}
+				Extend(itemSet);
+				auto it = in.find(GetUUID(itemSet));
+				if (it != in.end())
+				{
+					GO[MK_PAIR(index, key)] = it->second;
+				}
+				else
+				{
+					GO[MK_PAIR(index, key)] = cnt;
+					in[GetUUID(itemSet)] = cnt;
+					I.insert(MK_PAIR(cnt++, itemSet));
+				}
+			}
+		}
+		index++;
+	}
+}
+
+void Grammar::PrintGO() const
+{
+	for (auto& [key, value] : GO)
+	{
+		std::cout << "go(" << key.first << "," << key.second << ")=" << value << std::endl;
+	}
+}
+
+void Grammar::PrintI() const
+{
+	for (auto i : I)
+	{
+		std::cout << "I_" << i.first << "=" << GetUUID(i.second) << std::endl;
 	}
 }

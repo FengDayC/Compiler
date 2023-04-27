@@ -60,9 +60,17 @@ public:
 
     ItemSet GetClosure();
 
+    void GenerateGOandI(ItemSet closure);
+
+public:
+
     void PrintAllProduction() const;
 
     void PrintItemSet(ItemSet itemSet) const;
+
+    void PrintGO() const;
+
+    void PrintI() const;
 
 private:
     bool IsTerminal(std::string symbol) const;
@@ -77,6 +85,8 @@ private:
 
     std::string GetUUID(Item item) const;
 
+    std::string GetUUID(ItemSet itemSet) const;
+
     void Extend(ItemSet &itemSet) const;
 
 private:
@@ -90,4 +100,8 @@ private:
     std::map<std::string, std::vector<std::string>> productionsTable;
 
     std::map<std::string, Production> productions;
+
+    std::map<std::pair<int, std::string>,int> GO;
+
+    std::map<int, ItemSet> I;
 };
