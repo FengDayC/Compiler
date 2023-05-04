@@ -2,6 +2,8 @@
 
 class Grammar;
 
+struct Word;
+
 enum class ItemType
 {
 	Shift,Reduce,Jump,Accept
@@ -20,6 +22,12 @@ public:
 	Parser(S_PTR(Grammar) grammar);
 
 	void GenerateAnalyseTable();
+
+	void Parsing(S_PTR(std::vector<Word>) words) const;
+
+public:
+
+	void PrintAnalyseTable(const int space) const;
 
 private:
 	S_PTR(Grammar) grammar;

@@ -114,8 +114,8 @@ ItemSet Grammar::GetClosure()
 {
 	ItemSet closure;
 	//add an additional start
-	nonterminal.insert("$$$$$$$$$$$$$$$$");
-	Production additionalStart("$$$$$$$$$$$$$$$$", std::vector<std::string>{start});
+	nonterminal.insert("$$$$");
+	Production additionalStart("$$$$", std::vector<std::string>{start});
 	productions.insert(MK_PAIR(additionalStart.ToString(), additionalStart));
 	productionsTable.insert(MK_PAIR(additionalStart.GetHead(), std::vector<std::string>{additionalStart.ToString()}));
 	Item startItem{ 0,additionalStart.ToString(),false };
@@ -385,7 +385,7 @@ void Grammar::GenerateFirstAndFollow()
 		}
 	} while (added);
 
-	follow["$$$$$$$$$$$$$$$$"].insert("################");
+	follow["$$$$"].insert("####");
 	for (auto p : productions)
 	{
 		int length = p.second.GetLength();
@@ -462,9 +462,9 @@ void Grammar::PrintFollow() const
 	}
 }
 
-std::map<std::string, std::set<std::string>> Grammar::GetFollow() const
+std::set<std::string> Grammar::GetFollow(std::string symbol) const
 {
-	return follow;
+	return follow.at(symbol);
 }
 
 std::map<std::pair<int, std::string>, int> Grammar::GetGO() const
@@ -480,4 +480,14 @@ std::map<int, ItemSet> Grammar::GetI() const
 std::string Grammar::GetStart() const
 {
 	return start;
+}
+
+std::set<std::string> Grammar::GetTerminal() const
+{
+	return terminal;
+}
+
+std::set<std::string> Grammar::GetNonterminal() const
+{
+	return nonterminal;
 }

@@ -1,7 +1,8 @@
 #include "pch.h"
 #include "Grammar.h"
+#include "Parser.h"
 
-void TestClosure()
+S_PTR(Grammar) GenerateGrammar()
 {
     std::set<std::string> terminal{ "a","b","c","d" };
     std::set<std::string> nonterminal{ "S","A","B" };
@@ -34,10 +35,20 @@ void TestClosure()
     grammar->PrintFirst();
     std::cout << "Follow:" << std::endl;
     grammar->PrintFollow();
+
+    return grammar;
+}
+
+void GenerateAnalyseTable(S_PTR(Grammar) grammar)
+{
+    S_PTR(Parser, parser) = MK_SPTR(Parser,grammar);
+    parser->GenerateAnalyseTable();
+    parser->PrintAnalyseTable(18);
 }
 
 int main(int, char**) 
 {
-    TestClosure();
-    std::cout << "Hello, world!\n";
+    S_PTR(Grammar,grammar) = GenerateGrammar();
+    std::cout << "\nGenerate Grammar Successfully!\n";
+    GenerateAnalyseTable(grammar);
 }

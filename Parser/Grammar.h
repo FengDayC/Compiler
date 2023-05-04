@@ -87,8 +87,6 @@ public:
 
 private:
 
-    Production GetProduction(std::string key) const;
-
     std::string GetDotSymbol(Item item) const;
 
     Item GetNxt(Item item) const;
@@ -100,9 +98,11 @@ private:
     void Extend(ItemSet &itemSet) const;
 
 public:
-    std::map<std::string, std::set<std::string>> GetFollow() const;
+    std::set<std::string> GetFollow(std::string symbol) const;
 
     std::map<std::pair<int, std::string>, int> GetGO() const;
+
+    Production GetProduction(std::string key) const;
 
     bool IsTerminal(std::string symbol) const;
 
@@ -111,6 +111,10 @@ public:
     std::map<int, ItemSet> GetI() const;
 
     std::string GetStart() const;
+
+    std::set<std::string> GetTerminal() const;
+
+    std::set<std::string> GetNonterminal() const;
 
 private:
     
