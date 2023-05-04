@@ -15,18 +15,6 @@ public:
     bool operator<(const Item& b) const;
 };
 
-class ItemSet
-{
-    friend class Grammar;
-
-private:
-    std::set<Item> generator;
-    std::set<Item> items;
-
-public:
-    bool operator==(const ItemSet& b) const;
-};
-
 class Production
 {
 
@@ -50,6 +38,23 @@ public:
     std::string GetHead() const;
 
     int GetLength() const;
+};
+
+class ItemSet
+{
+    friend class Grammar;
+
+private:
+    std::set<Item> generator;
+    std::set<Item> items;
+
+public:
+    bool Contains(const Item& Item) const;
+
+    std::set<Item> GetAllItem() const;
+
+public:
+    bool operator==(const ItemSet& b) const;
 };
 
 class Grammar
@@ -81,9 +86,6 @@ public:
     void PrintFollow() const;
 
 private:
-    bool IsTerminal(std::string symbol) const;
-
-    bool IsNonTerminal(std::string symbol) const;
 
     Production GetProduction(std::string key) const;
 
@@ -96,6 +98,19 @@ private:
     std::string GetUUID(ItemSet itemSet) const;
 
     void Extend(ItemSet &itemSet) const;
+
+public:
+    std::map<std::string, std::set<std::string>> GetFollow() const;
+
+    std::map<std::pair<int, std::string>, int> GetGO() const;
+
+    bool IsTerminal(std::string symbol) const;
+
+    bool IsNonTerminal(std::string symbol) const;
+
+    std::map<int, ItemSet> GetI() const;
+
+    std::string GetStart() const;
 
 private:
     

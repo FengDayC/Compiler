@@ -33,6 +33,20 @@ bool ItemSet::operator==(const ItemSet& b) const
 	return true;
 }
 
+bool ItemSet::Contains(const Item& item) const
+{
+	return generator.find(item) != generator.end() || items.find(item) != items.end();
+}
+
+std::set<Item> ItemSet::GetAllItem() const
+{
+	std::set<Item> res;
+	std::set_union(generator.begin(), generator.end(), items.begin(), items.end(), std::inserter(res, res.begin()));
+	return res;
+}
+
+/***Production***/
+
 Production::Production(std::string head, std::vector<std::string> body)
 	:head(head),body(body),length(body.size())
 {
@@ -77,6 +91,8 @@ int Production::GetLength() const
 {
 	return length;
 }
+
+/***Grammar***/
 
 Grammar::Grammar(std::string start, std::set<std::string> terminal, std::set<std::string> nonterminal, std::map<std::string, std::vector<std::vector<std::string>>> productionsTable)
 	:start(start),terminal(terminal),nonterminal(nonterminal)
@@ -444,4 +460,24 @@ void Grammar::PrintFollow() const
 		}
 		std::cout << "}" << std::endl;
 	}
+}
+
+std::map<std::string, std::set<std::string>> Grammar::GetFollow() const
+{
+	return follow;
+}
+
+std::map<std::pair<int, std::string>, int> Grammar::GetGO() const
+{
+	return GO;
+}
+
+std::map<int, ItemSet> Grammar::GetI() const
+{
+	return I;
+}
+
+std::string Grammar::GetStart() const
+{
+	return start;
 }

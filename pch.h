@@ -10,6 +10,7 @@
 #include<initializer_list>
 #include<functional>
 #include<list>
+#include<algorithm>
 
 /*###############################Utils########################################*/
 
