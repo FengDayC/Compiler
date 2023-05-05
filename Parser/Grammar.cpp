@@ -47,10 +47,12 @@ std::set<Item> ItemSet::GetAllItem() const
 
 /***Production***/
 
+Production::Production() {}
+
 Production::Production(std::string head, std::vector<std::string> body)
 	:head(head),body(body),length(body.size())
 {
-
+	subFunction = nullptr;
 }
 
 Production::Production(std::vector<std::string> items)
@@ -59,6 +61,7 @@ Production::Production(std::vector<std::string> items)
 	head = *it;
 	body.assign(it + 1, items.end());
 	length = body.size();
+	subFunction = nullptr;
 }
 
 std::string Production::ToString() const
@@ -92,22 +95,24 @@ int Production::GetLength() const
 	return length;
 }
 
+void Production::BindSubFunc(std::function<void(void*)> func)
+{
+	subFunction = func;
+}
+
+void Production::InvokeSubFunc(void* args) const
+{
+	if (subFunction != nullptr)
+	{
+		subFunction(args);
+	}
+}
+
 /***Grammar***/
 
-Grammar::Grammar(std::string start, std::set<std::string> terminal, std::set<std::string> nonterminal, std::map<std::string, std::vector<std::vector<std::string>>> productionsTable)
+Grammar::Grammar(std::string start, std::set<std::string> terminal, std::set<std::string> nonterminal)
 	:start(start),terminal(terminal),nonterminal(nonterminal)
 {
-	for (auto p : productionsTable)
-	{
-		std::vector<std::string> productionSameHead;
-		for (auto pp : p.second)
-		{
-			Production production(p.first, pp);
-			productionSameHead.push_back(production.ToString());
-			this->productions.insert(MK_PAIR(production.ToString(), production));
-		}
-		this->productionsTable.insert(MK_PAIR(p.first, productionSameHead));
-	}
 }
 
 ItemSet Grammar::GetClosure()
@@ -115,7 +120,7 @@ ItemSet Grammar::GetClosure()
 	ItemSet closure;
 	//add an additional start
 	nonterminal.insert("$$$$");
-	Production additionalStart("$$$$", std::vector<std::string>{start});
+	Production additionalStart(std::vector<std::string>{"$$$$",start});
 	productions.insert(MK_PAIR(additionalStart.ToString(), additionalStart));
 	productionsTable.insert(MK_PAIR(additionalStart.GetHead(), std::vector<std::string>{additionalStart.ToString()}));
 	Item startItem{ 0,additionalStart.ToString(),false };
@@ -460,6 +465,12 @@ void Grammar::PrintFollow() const
 		}
 		std::cout << "}" << std::endl;
 	}
+}
+
+void Grammar::AddProduction(Production p)
+{
+	productions[p.ToString()] = p;
+	productionsTable[p.head].push_back(p.ToString());
 }
 
 std::set<std::string> Grammar::GetFollow(std::string symbol) const

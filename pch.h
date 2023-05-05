@@ -12,6 +12,7 @@
 #include<list>
 #include<algorithm>
 #include<iomanip>
+#include<stack>
 
 /*###############################Utils########################################*/
 

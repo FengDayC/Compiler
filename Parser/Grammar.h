@@ -23,8 +23,11 @@ private:
     std::string head;
     std::vector<std::string> body;
     int length;
+    std::function<void(void*)> subFunction;
 
 public:
+    Production();
+
     Production(std::string head, std::vector<std::string> body);
 
     Production(std::vector<std::string> items);
@@ -38,6 +41,10 @@ public:
     std::string GetHead() const;
 
     int GetLength() const;
+
+    void BindSubFunc(std::function<void(void*)> func);
+
+    void InvokeSubFunc(void* args) const;
 };
 
 class ItemSet
@@ -61,7 +68,7 @@ class Grammar
 {
 public:
 
-    Grammar(std::string start, std::set<std::string> terminal, std::set<std::string> nonterminal, std::map<std::string, std::vector<std::vector<std::string>>> productionsTable);
+    Grammar(std::string start, std::set<std::string> terminal, std::set<std::string> nonterminal);
 
 public:
 
@@ -98,6 +105,9 @@ private:
     void Extend(ItemSet &itemSet) const;
 
 public:
+    
+    void AddProduction(Production p);
+
     std::set<std::string> GetFollow(std::string symbol) const;
 
     std::map<std::pair<int, std::string>, int> GetGO() const;

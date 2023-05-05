@@ -23,7 +23,7 @@ public:
 
 	void GenerateAnalyseTable();
 
-	void Parsing(S_PTR(std::vector<Word>) words) const;
+	void Parsing(S_PTR(std::vector<std::string>) words) const;
 
 public:
 
